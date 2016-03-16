@@ -1,0 +1,22 @@
+Initial clone:
+git clone https://github.com/magland/prsim.git
+
+STAGE/COMMIT/PUSH/PULL
+
+If jfm makes changes and commits and pushes the changes then you get them by:
+git pull
+
+If cle makes changes then....
+git add -u #updates every that's being tracked
+git commit -m "what I did"
+git push
+
+If cle adds a file:
+vi file.txt...
+git add file.txt
+git commit -m "I added a file" 
+git push
+
+If there's a conflict (we both edited same file)
+There are ways to deal with.
+
