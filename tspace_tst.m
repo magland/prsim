@@ -2,23 +2,23 @@ opts.oversamp=2;
 opts.N=16;
 opts.k=2;
 opts.num_disks=30;
+opts.xsupp_msk=5;
 %
 clear intdim ecnt dindex j rand_seed Tv Nv x0 s0
 %
 mincos = .99;
 randmin =1;
-randmax =1000;
+randmax =500;
 %Build examples
 ecnt = 0;
 ftang=figure; set(ftang,'position',[100,1500,300,300]);
 
 for j=randmin:randmax
-rand_seed=j;
-%Set the random number generator
-rng(rand_seed);
+    %PH_1 sets the random number generator through this variable
+opts.seed=j;
 [x0,s0]=PH_1(opts);
 u=abs(fft0(ref_image));
-algopts.support_mask=support_mask;
+algopts.support_mask=s0;
 %Compute the tangent and normal spaces to the amplitude torus defined by x0
 [Tv Nv] = torus_tansp(x0);
 %Now we compare to the support constraint

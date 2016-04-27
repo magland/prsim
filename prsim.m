@@ -14,7 +14,6 @@ for tt=1:num_trials
     algopts.support_mask=support_mask;
     u=abs(fft0(ref_image));
     for rr=1:num_restarts
-        
         init_image_hat=u.*exp(2*pi*i*rand(size(u)));
         init_image=ifft0(init_image_hat);
         DD=struct;
@@ -31,7 +30,7 @@ for tt=1:num_trials
             if (toc(tA)>1)||(it==1)||(it==num_iterations)
                 recon=register_to_reference(recon,ref_image);
                 errors(it)=compute_residual(recon,ref_image);
-                update_single_run_figure(fA,ref_image,recon,alg_resids,errors);
+                update_single_run_figure(fA,ref_image,init_image,recon,alg_resids,errors,algopts,phopts);
                 title(sprintf('trial %d, restart %d',tt,rr));
                 drawnow;
                 tA=tic;
@@ -46,7 +45,8 @@ for tt=1:num_trials
 end;
 
 figure; hist(results.errors,100)
-title('Errors');
+title(sprintf('Errors, Algorithm %s, positivity %d, support %d',...
+info.name,algopts.positivity,algopts.support));
 
 figure;
 for tt=1:num_trials
@@ -54,6 +54,7 @@ for rr=1:num_restarts
     tmp=results.alg_resids{rr,tt};
     semilogy(1:length(tmp),tmp); hold on;
 end;
+title(sprintf('Algorithm %s, positivity %d, support %d',info.name,algopts.positivity,algopts.support));
 end;
 
 end

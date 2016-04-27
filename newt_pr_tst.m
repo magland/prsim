@@ -1,22 +1,25 @@
 %Options to define the phantom
 %clear all
 opts.oversamp=2;
-opts.N=16;
+opts.N=32;
 opts.k=2;
 opts.num_disks=30;
+opts.xsupp_msk=2;
 %Give the variance for the initial choice of phases. 
 %For completely random choice set to opts.N
-opts.sigma=4;%opts.N;
+opts.sigma=.1;%opts.N;
 %
 %Options to control the auxiliary conditions used
 algopts.positivity=0;
 algopts.support=1;
 %To regularize the support condition
-algopts.eps_reg=0;
-mincos =.98;
+algopts.eps_reg=0;%10^(-12);
+mincos =.99;
 rand_seed = 762
+%A random see for the initialization of the algorithm
+rand_seed_init = 25;
 %How many iterations should we try?
-num_iterations=300;
+num_iterations=10;
 %Build examples
 %Choose an algorithm
 ALG=@ALG_NEWT;
@@ -35,7 +38,7 @@ if strcmp(func2str(ALG),'ALG_NEWT')
 end
 %Set the random number generator
 %
-rng(rand_seed);
+opts.seed=rand_seed;
 [ref_image,support_mask]=PH_1(opts);
 algopts.support_mask=support_mask;
 u=abs(fftn(ref_image));
@@ -47,10 +50,11 @@ init_image = 0;
 %Need to use fft0 to get the initial guess to be a real image
 %We randomize around the known phases of the initial image
 if (init_image == 0)
+    rng(rand_seed_init);
     u0=fft0(ref_image);
     sigma=opts.sigma/opts.N %How random is the initial data sigma = 1 is completely random
                    %We divide by opts.N to control the L^2 error
-    dth=2*pi*sigma*(rand(size(u0))-0.5*ones(size(u0)));
+    dth=2*pi*sigma*(rand(size(u0))-0.5*ones(size(u0)));%Random numbers take values between -0.5 and 0.5.
 
     init_image_hat=u0.*exp(dth*i);
     init_image=ifft0(init_image_hat);
@@ -91,9 +95,11 @@ ecnt =0;
             tA=tic;
             
             %if (toc(tA)>1)||(it==1)||(it==num_iterations)
-                recon=register_to_reference(recon,ref_image);
-                errors(it)=compute_residual(recon,ref_image);
-                update_single_run_figure(fA,ref_image,init_image,recon,alg_resids,...
+%                 recon=register_to_reference(recon,ref_image);
+%                 errors(it)=compute_residual(recon,ref_image);
+%This avoids the problems of registration error
+                errors(it)=norm(abs(fftn(pi_B(recon,algopts)))-u)/norm(u);
+                update_single_run_figure(fA,ref_image,support_mask,recon,alg_resids,...
                     errors,algopts,opts);
                 %drawnow;
                 %tA=tic;
@@ -106,12 +112,12 @@ end;
 if two_step == 1
     %Options to control the auxiliary conditions used
     algopts2.positivity=1;
-    algopts2.support=0;
+    algopts2.support=1;
     %To regularize the support condition
-    algopts2.eps_reg=0%10^(-8);
+    algopts2.eps_reg=0;%10^(-8);
     algopts2.support_mask=support_mask;
     %How many iterations should we try?
-    num_iterations2=4;
+    num_iterations2=3;
     %Build examples
     %Choose an algorithm
     %ALG=@ALG_NEWT;

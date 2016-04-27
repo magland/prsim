@@ -1,5 +1,7 @@
 function [D,recon,info]=ALG_BA_HIO(D,u,algopts)
 
+info.name='BA-HIO';
+%
 algopts.u=u;
 f0=D.x;
 pi_A_f0=pi_A(f0,algopts);

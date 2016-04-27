@@ -54,7 +54,7 @@ else %No upper and lower bounds
 end
 
 %We want to minimize the square sum of the coordinates over the complement
-%of the KNOWN support, [0,optsalg.suppint], and we also include a penalty term
+%of the KNOWN support, and we may also include a penalty term
 %of size eps_reg to prevent wandering in the support subspace.
 eps_reg=0;
 if algopts.support == 1
